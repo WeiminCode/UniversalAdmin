@@ -1,4 +1,4 @@
-Vue3+Vite+Element-plus+Pinia+apifox+后台管理
+Vue3+Vite+Element-plus+Pinia+apifox+后台管理(推荐使用Typora打开该笔记)
 
 创建项目
 
