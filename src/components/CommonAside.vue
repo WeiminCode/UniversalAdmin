@@ -5,6 +5,7 @@
       text-color="#fff"
       :collapse="isCollapse"
       :collapse-transition="false"
+      :default-active="route.path"
     >
       <h3 v-show="!isCollapse">通用后台管理系统</h3>
       <h3 v-show="isCollapse">后台</h3>
@@ -12,6 +13,7 @@
         v-for="item in noChildren"
         :key="item.path"
         :index="item.path"
+        @click="clickMenu(item)"
       >
         <component class="icons" :is="item.icon"> </component>
         <span>{{ item.label }}</span>
@@ -31,6 +33,7 @@
             v-for="(subItem, subIndex) in item.children"
             :key="subItem.path"
             :index="subItem.path"
+            @click="clickMenu(subItem)"
           >
             <component class="icons" :is="subItem.icon"></component>
             <span>{{ subItem.label }}</span>
@@ -43,6 +46,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
 //引入pinia
 import { useAllDataStore } from "@/stores/index.js";
@@ -100,6 +104,14 @@ const isCollapse = computed(() => store.state.isCollapse);
 
 //width
 const width = computed(() => (store.state.isCollapse ? "64px" : "180px"));
+
+const router = useRouter();
+const route = useRoute();
+const clickMenu = (item) => {
+  router.push(item.path)
+  store.selectMenu(item);
+};
+
 </script>
 
 <style lang="less" scoped>

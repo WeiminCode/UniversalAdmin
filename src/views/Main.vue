@@ -9,6 +9,7 @@
           <!-- 自定义右侧头部组件 -->
           <CommonHeader />
         </el-header>
+        <CommomTab />
         <el-main class="right-main">
           <router-view />
         </el-main>
@@ -21,6 +22,7 @@
 //引入左侧组件
 import CommonAside from "@/components/CommonAside.vue";
 import CommonHeader from "../components/CommonHeader.vue";
+import CommomTab from "@/components/CommomTab.vue";
 </script>
 
 <style scoped lang="less">
