@@ -8,10 +8,52 @@ export function getTableData() {
     method: "get",
   });
 }
-
+//请求首页左侧表格数据
 export function getCountData() {
   return request({
     url: "/home/getCountData",
     method: "get",
+  });
+}
+//请求首页右侧图表数据
+export function getChartData() {
+  return request({
+    url: "/home/getChartData",
+    method: "get",
+  });
+}
+//请求用户表格数据
+export function getUserData(data) {
+  return request({
+    url: "/home/getUserData",
+    method: "get",
+    data,
+  });
+}
+
+//删除用户
+export function deleteUser(data) {
+  return request({
+    url: "/home/deleteUser",
+    method: "get",
+    data,
+  });
+}
+
+//新增用户
+export function createUser(data) {
+  return request({
+    url: "/user/addUser",
+    method: "post",
+    data,
+  });
+}
+
+//编辑用户
+export function editUser(data) {
+  return request({
+    url: "/user/editUser",
+    method: "post",
+    data,
   });
 }
