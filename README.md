@@ -1,4 +1,4 @@
-Vue3+Vite+Element-plus+Pinia+apifox+后台管理(推荐使用Typora打开该笔记)
+Vue3+Vite+Element-plus+Pinia+apifox+后台管理
 
 创建项目
 
@@ -2026,5 +2026,399 @@ User.vue
         })
     }
     </script>
+
+tag的静态实现
+
+新建@/components/CommonTab.vue
+
+    <template>
+        <div class="tags">
+            <el-tag
+                v-for="(tag,index) in tags"
+                :key="tag.name"
+                :closable="tag.name !== 'home'"
+                :effect="tag.name === route.name ? 'dark' : 'plain'" 
+            >
+            {{ tag.label }}
+            </el-tag>
+    
+        </div>
+    
+    </template>
+    
+    <script setup>
+    import { ref } from 'vue';
+    import { useRoute } from 'vue-router';
+    const tags = ref([
+        {
+            path: '/home',
+            name: 'home',
+            label: '首页',
+            icon: 'home'
+        },
+    ])
+    
+    const route = useRoute();
+    
+    
+    </script>
+    
+    <style scoped lang="less">
+    .tags{
+        margin: 20px 0 0 20px;
+    }
+    .el-tag{
+        margin-right: 10px;
+    }
+    
+    </style>
+
+修改Main.vue
+
+    <template>
+      <div class="common-layout">
+        <el-container class="lay-container">
+          <!-- 自定义左侧组件 -->
+          <CommonAside />
+          <!-- 右侧 -->
+          <el-container>
+            <el-header class="el-header">
+              <!-- 自定义右侧头部组件 -->
+              <CommonHeader />
+            </el-header>
+            <CommomTab />
+            <el-main class="right-main">
+              <router-view />
+            </el-main>
+          </el-container>
+        </el-container>
+      </div>
+    </template>
+    
+    <script setup>
+    //引入左侧组件
+    import CommonAside from "@/components/CommonAside.vue";
+    import CommonHeader from "../components/CommonHeader.vue";
+    import CommomTab from "@/components/CommomTab.vue";
+    </script>
+    
+    <style scoped lang="less">
+    .common-layout,
+    .lay-container {
+      height: 100%;
+    }
+    .el-header {
+      background-color: #333;
+    }
+    </style>
+    
+
+tag通过pinia管理
+
+CommonAside.vue优化点击跳转和页面刷新默认激活菜单
+
+    <template>
+      <el-aside :width="width">
+        <el-menu
+          background-color="#545c64"
+          text-color="#fff"
+          :collapse="isCollapse"
+          :collapse-transition="false"
+          :default-active="route.path"
+        >
+          <h3 v-show="!isCollapse">通用后台管理系统</h3>
+          <h3 v-show="isCollapse">后台</h3>
+          <el-menu-item
+            v-for="item in noChildren"
+            :key="item.path"
+            :index="item.path"
+            @click="clickMenu(item)"
+          >
+            <component class="icons" :is="item.icon"> </component>
+            <span>{{ item.label }}</span>
+          </el-menu-item>
+    
+          <el-sub-menu
+            v-for="item in hasChildren"
+            :key="item.path"
+            :index="item.path"
+          >
+            <template #title>
+              <component class="icons" :is="item.icon"></component>
+              <span>{{ item.label }}</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item
+                v-for="(subItem, subIndex) in item.children"
+                :key="subItem.path"
+                :index="subItem.path"
+                @click="clickMenu(subItem)"
+              >
+                <component class="icons" :is="subItem.icon"></component>
+                <span>{{ subItem.label }}</span>
+              </el-menu-item>
+            </el-menu-item-group>
+          </el-sub-menu>
+        </el-menu>
+      </el-aside>
+    </template>
+    
+    <script setup>
+    import { ref, computed } from "vue";
+    import { useRouter, useRoute } from "vue-router";
+    
+    //引入pinia
+    import { useAllDataStore } from "@/stores/index.js";
+    const store = useAllDataStore();
+    
+    const list = ref([
+      {
+        path: "/home",
+        name: "home",
+        label: "首页",
+        icon: "house",
+        url: "Home",
+      },
+      {
+        path: "/mall",
+        name: "mall",
+        label: "商品管理",
+        icon: "video-play",
+        url: "Mall",
+      },
+      {
+        path: "/user",
+        name: "user",
+        label: "用户管理",
+        icon: "user",
+        url: "User",
+      },
+      {
+        path: "other",
+        label: "其他",
+        icon: "location",
+        children: [
+          {
+            path: "/page1",
+            name: "page1",
+            label: "页面1",
+            icon: "setting",
+            url: "Page1",
+          },
+          {
+            path: "/page2",
+            name: "page2",
+            label: "页面2",
+            icon: "setting",
+            url: "Page2",
+          },
+        ],
+      },
+    ]);
+    
+    const noChildren = computed(() => list.value.filter((item) => !item.children));
+    const hasChildren = computed(() => list.value.filter((item) => item.children));
+    
+    const isCollapse = computed(() => store.state.isCollapse);
+    
+    //width
+    const width = computed(() => (store.state.isCollapse ? "64px" : "180px"));
+    
+    const router = useRouter();
+    const route = useRoute();
+    const clickMenu = (item) => {
+      router.push(item.path)
+    };
+    
+    </script>
+    
+    <style lang="less" scoped>
+    .icons {
+      width: 18px;
+      height: 18px;
+      margin-right: 5px;
+    }
+    .el-menu {
+      border-right: none;
+      h3 {
+        line-height: 48px;
+        color: #fff;
+        text-align: center;
+      }
+    }
+    .el-aside {
+      background-color: #545c64;
+      height: 100%;
+    }
+    </style>
+
+CommonTab.vue中的tags通过pinia来管理，新增selectMenu方法。
+
+修改stores/index.js
+
+    import { defineStore } from "pinia";
+    import { ref, computed } from "vue";
+    
+    function initState() {
+      return {
+        isCollapse: false,
+        tags: [
+          {
+            path: '/home',
+            name: 'home',
+            label: '首页',
+            icon: 'home'
+          },
+        ],
+        currentMenu: null,
+    
+      };
+    }
+    
+    export const useAllDataStore = defineStore("allData", () => {
+      //ref() 就是 state 属性
+      //computed() 就是 getters
+      //function() 就是 actions
+      const state = ref(initState());
+    
+      function selectMenu(val) {
+        if(val.name === "home") {
+          state.value.currentMenu = null;
+        }else{
+          let index = state.value.tags.findIndex(item => item.name === val.name);
+          index === -1 ? state.value.tags.push(val) : "";
+        }
+      }
+    
+      return { state, selectMenu, };
+    });
+    
+
+修改CommonTab.vue
+
+    <script>
+        import { useAllDataStore } from '@/stores'
+        const store = useAllDataStore();
+        const tags = computed(()=>store.state.tags)
+    </script>
+
+修改CommonAside.vue
+
+    <script>
+    
+    const clickMenu = (item) => {
+      router.push(item.path)
+      store.selectMenu(item);
+    };
+        
+    </script>
+
+tag收尾
+
+CommonTab.vue
+
+    <template>
+        <div class="tags">
+            <el-tag
+                v-for="(tag,index) in tags"
+                :key="tag.name"
+                :closable="tag.name !== 'home'"
+                :effect="tag.name === route.name ? 'dark' : 'plain'" 
+                @click="handleMenu(tag)"
+                @close="handleClose(tag,index)"
+            >
+            {{ tag.label }}
+            </el-tag>
+    
+        </div>
+    
+    </template>
+    
+    <script setup>
+    import { ref } from 'vue';
+    import { useRoute,useRouter } from 'vue-router';
+    import { useAllDataStore } from '@/stores';
+    const store = useAllDataStore();
+    
+    const tags = computed(() => store.state.tags);
+    
+    const route = useRoute();
+    const router = useRouter();
+    
+    const handleMenu = (tag) => {
+        router.push(tag.path);
+        store.selectMenu(tag);
+    }
+    
+    const handleClose = (tag,index) => {
+        //通过pinia管理的
+        store.updateTags(tag);
+        if(tag.name !== route.name) return;
+        if(index === store.state.tags.length){
+            store.selectMenu(store.state.tags[index-1]);
+            router.push(tags.value[index-1].path);
+        }else{
+            store.selectMenu(store.state.tags[index]);
+            router.push(store.state.tags[index].path);
+        }
+    }
+    
+    
+    </script>
+    
+    <style scoped lang="less">
+    .tags{
+        margin: 20px 0 0 20px;
+    }
+    .el-tag{
+        margin-right: 10px;
+    }
+    
+    </style>
+
+@/stores/index.js
+
+    import { defineStore } from "pinia";
+    import { ref, computed } from "vue";
+    
+    function initState() {
+      return {
+        isCollapse: false,
+        tags: [
+          {
+            path: '/home',
+            name: 'home',
+            label: '首页',
+            icon: 'home'
+          },
+        ],
+        currentMenu: null,
+    
+      };
+    }
+    
+    export const useAllDataStore = defineStore("allData", () => {
+      //ref() 就是 state 属性
+      //computed() 就是 getters
+      //function() 就是 actions
+      const state = ref(initState());
+    
+      function selectMenu(val) {
+        if(val.name === "home") {
+          state.value.currentMenu = null;
+        }else{
+          let index = state.value.tags.findIndex(item => item.name === val.name);
+          index === -1 ? state.value.tags.push(val) : "";
+        }
+      }
+    
+      function updateTags(tag) {
+        let index = state.value.tags.findIndex(item => item.name === tag.name);
+        state.value.tags.splice(index,1);
+      }
+    
+      return { state, selectMenu, updateTags };
+    });
+    
 
 
