@@ -2,7 +2,7 @@
 
 ## 创建项目
 
-vite官方中文文档地址：开始 | Vite 官方中文文档
+vite官方中文文档地址：https://cn.vitejs.dev/guide/#scaffolding-your-first-vite-project
 
     1、npm create vite@latest my-vue-app -- --template vue
     
