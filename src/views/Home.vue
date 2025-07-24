@@ -157,7 +157,7 @@ onBeforeMount(() => {
     const { orderData, userData, videoData } = res;
     // console.log(orderData);
     // console.log(userData);
-    console.log(videoData);
+    // console.log(videoData);
 
     // 对第一个图表进行 X轴 和 series 赋值
     xOptions.xAxis.data = orderData.date;

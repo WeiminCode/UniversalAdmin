@@ -13,6 +13,9 @@ function initState() {
       },
     ],
     currentMenu: null,
+    menuList:[],
+    token:"",
+    routerList:[],
 
   };
 }
@@ -37,5 +40,40 @@ export const useAllDataStore = defineStore("allData", () => {
     state.value.tags.splice(index,1);
   }
 
-  return { state, selectMenu, updateTags };
+  function updateMenuList(val){
+    state.value.menuList = val;
+  }
+
+  //动态路由，根据菜单生成路由
+  function addMenu(router){
+    const menu = state.value.menuList;
+    console.log(menu);
+    const module = import.meta.glob('../views/**/*.vue');
+    const routeArr = [];
+    menu.forEach((item)=>{
+      if (item.children){
+        item.children.forEach((val)=>{
+          let url = `../views/${val.url}.vue`;
+          val.component = module[url];
+          routeArr.push(...item.children);
+        })
+      } else {
+        let url = `../views/${item.url}.vue`;
+        item.component = module[url];
+        routeArr.push(item);
+      }
+    })
+    routeArr.forEach((item)=>{
+      state.value.routerList.push(router.addRoute('main',item));
+    })
+
+  }
+
+  return { 
+    state, 
+    selectMenu, 
+    updateTags,
+    updateMenuList,
+    addMenu
+  };
 });

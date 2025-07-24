@@ -9,20 +9,32 @@
                 <el-input  type="password" v-model="loginForm.password" placeholder="请输入密码"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="login">登录</el-button>
+                <el-button type="primary" @click="handleLogin">登录</el-button>
             </el-form-item>
         </el-form>
     </div>
 </template>
 
 <script setup>
+import { getMenu } from '@/api/api';
 import { reactive } from 'vue';
+import { useAllDataStore } from '@/stores';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const store = useAllDataStore();
 const loginForm = reactive({
     username: '',
     password: ''
 })
-const login = () => {
-    console.log(loginForm);
+const handleLogin = () => {
+    getMenu(loginForm).then(res => {
+        //拿到菜单以后
+        store.updateMenuList(res.menuList)
+        store.state.token = res.token;
+        store.addMenu(router);
+        router.push('/home');
+        
+    })
 }
 </script>
 
