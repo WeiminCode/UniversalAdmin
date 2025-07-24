@@ -57,3 +57,12 @@ export function editUser(data) {
     data,
   });
 }
+
+//登录
+export function getMenu(params) {
+  return request({
+    url: '/permission/getMenu',
+    method: 'post',
+    data: params
+  })
+}
