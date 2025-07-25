@@ -93,12 +93,24 @@ export const useAllDataStore = defineStore("allData", () => {
     })
   }
 
+  function logout(){
+    state.value.routerList.forEach((item)=>{
+      if(item) item();
+    })
+    // 清空所有数据
+    state.value = initState();
+    // 清空本地存储
+    localStorage.removeItem('store');
+
+  }
+
   return { 
     state, 
     selectMenu, 
     updateTags,
     updateMenuList,
-    addMenu
+    addMenu,
+    logout
   };
 
 });
