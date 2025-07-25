@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref, watch } from "vue";
 
 function initState() {
   return {
@@ -26,6 +26,11 @@ export const useAllDataStore = defineStore("allData", () => {
   //function() 就是 actions
   const state = ref(initState());
 
+  watch(state,(newObj)=>{
+    if(!newObj.token) return;
+    localStorage.setItem('store',JSON.stringify(newObj));
+  },{deep:true})
+
   function selectMenu(val) {
     if(val.name === "home") {
       state.value.currentMenu = null;
@@ -45,11 +50,31 @@ export const useAllDataStore = defineStore("allData", () => {
   }
 
   //动态路由，根据菜单生成路由
-  function addMenu(router){
+  function addMenu(router,type){
+    if(type === "refresh"){
+      if(JSON.parse(localStorage.getItem('store'))){
+        state.value = JSON.parse(localStorage.getItem('store'));
+        //
+        state.value.routerList = [];
+      }else{
+        return;
+      }
+    }
     const menu = state.value.menuList;
     console.log(menu);
     const module = import.meta.glob('../views/**/*.vue');
     const routeArr = [];
+    //解决多账号路由问题
+    let routers = router.getRoutes();
+    // console.log(routers); 
+    routers.forEach((item)=>{
+      if(item.name === 'main' || item.name === 'login'){
+        return;
+      } else{
+        router.removeRoute(item.name);
+      }
+    })
+    //
     menu.forEach((item)=>{
       if (item.children){
         item.children.forEach((val)=>{
@@ -66,7 +91,6 @@ export const useAllDataStore = defineStore("allData", () => {
     routeArr.forEach((item)=>{
       state.value.routerList.push(router.addRoute('main',item));
     })
-
   }
 
   return { 
@@ -76,4 +100,5 @@ export const useAllDataStore = defineStore("allData", () => {
     updateMenuList,
     addMenu
   };
+
 });
